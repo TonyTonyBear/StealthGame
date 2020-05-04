@@ -6,6 +6,11 @@
 #include "GameFramework/Actor.h"
 #include "FPSObjectiveActor.generated.h"
 
+// Forward Declarations
+class UStaticMeshComponent;
+class USphereComponent;
+class UParticleSystem;
+
 UCLASS()
 class FPSGAME_API AFPSObjectiveActor : public AActor
 {
@@ -19,8 +24,20 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	UPROPERTY(VisibleAnywhere, Category="Components")
+	UStaticMeshComponent* MeshComponent;
+
+	UPROPERTY(VisibleAnywhere, Category="Components")
+	USphereComponent* SphereComponent;
+
+	UPROPERTY(EditDefaultsOnly, Category="Effects")
+	UParticleSystem* PickupEffect = nullptr;
+
+	void PlayEffects();
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	virtual void NotifyActorBeginOverlap(AActor* OtherActor) override;
 };
