@@ -6,6 +6,7 @@
 #include "Perception/PawnSensingComponent.h"
 #include "DrawDebugHelpers.h"
 #include "FPSGameMode.h"
+#include "Blueprint/AIBlueprintHelperLibrary.h"
 
 // Sets default values
 AFPSAIGuard::AFPSAIGuard()
@@ -28,6 +29,11 @@ void AFPSAIGuard::BeginPlay()
 	Super::BeginPlay();
 
 	OriginalRotation = GetActorRotation();
+
+	if (bIsPatroling)
+	{
+		MoveToNextPatrolPoint();
+	}
 	
 }
 
@@ -48,6 +54,13 @@ void AFPSAIGuard::ReactToSeeingPawn(APawn * SeenPawn)
 	}
 
 	SetGuardState(EAIState::ALERTED);
+
+	AController* Controller = GetController();
+
+	if (Controller)
+	{
+		Controller->StopMovement();
+	}
 }
 
 void AFPSAIGuard::ReactToHearingNoise(APawn * NoiseInstigator, const FVector & Location, float Volume)
@@ -72,6 +85,13 @@ void AFPSAIGuard::ReactToHearingNoise(APawn * NoiseInstigator, const FVector & L
 	GetWorldTimerManager().SetTimer(TimerHandle_ResetOrientation, this, &AFPSAIGuard::ResetOrientation, 3.f);
 
 	SetGuardState(EAIState::SUSPICIOUS);
+
+	AController* Controller = GetController();
+
+	if (Controller)
+	{
+		Controller->StopMovement();
+	}
 }
 
 void AFPSAIGuard::ResetOrientation()
@@ -84,6 +104,11 @@ void AFPSAIGuard::ResetOrientation()
 	SetActorRotation(OriginalRotation);
 
 	SetGuardState(EAIState::IDLE);
+
+	if (bIsPatroling)
+	{
+		MoveToNextPatrolPoint();
+	}
 }
 
 void AFPSAIGuard::SetGuardState(EAIState NewState)
@@ -98,11 +123,37 @@ void AFPSAIGuard::SetGuardState(EAIState NewState)
 	OnStateChanged(GuardState);
 }
 
+void AFPSAIGuard::MoveToNextPatrolPoint()
+{
+	if (CurrentPatrolPoint == nullptr || CurrentPatrolPoint == SecondPatrolPoint)
+	{
+		CurrentPatrolPoint = FirstPatrolPoint;
+	}
+	else
+	{
+		CurrentPatrolPoint = SecondPatrolPoint;
+	}
+
+	UAIBlueprintHelperLibrary::SimpleMoveToActor(GetController(), CurrentPatrolPoint);
+}
+
 // Called every frame
 void AFPSAIGuard::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+
+	// Check patrol point distances.
+	if (CurrentPatrolPoint)
+	{
+		FVector Delta = GetActorLocation() - CurrentPatrolPoint->GetActorLocation();
+		float Distance = Delta.Size();
+
+		if (Distance < 100.f)
+		{
+			MoveToNextPatrolPoint();
+		}
+	}
 }
 
 
