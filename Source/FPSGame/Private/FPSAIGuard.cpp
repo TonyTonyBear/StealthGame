@@ -16,6 +16,7 @@ AFPSAIGuard::AFPSAIGuard()
 
 	// Bind to OnSeePawn Event.
 	SenseComponent->OnSeePawn.AddDynamic(this, &AFPSAIGuard::ReactToSeeingPawn);
+	SenseComponent->OnHearNoise.AddDynamic(this, &AFPSAIGuard::ReactToHearingNoise);
 
 }
 
@@ -33,7 +34,12 @@ void AFPSAIGuard::ReactToSeeingPawn(APawn * SeenPawn)
 		return;
 	}
 
-	DrawDebugSphere(GetWorld(), SeenPawn->GetActorLocation(), 32.f, 12, FColor::Yellow, false, 10.f);
+	DrawDebugSphere(GetWorld(), SeenPawn->GetActorLocation(), 32.f, 12, FColor::Red, false, 10.f);
+}
+
+void AFPSAIGuard::ReactToHearingNoise(APawn * NoiseInstigator, const FVector & Location, float Volume)
+{
+	DrawDebugSphere(GetWorld(), Location, 32.f, 12, FColor::Green, false, 10.f);
 }
 
 // Called every frame
