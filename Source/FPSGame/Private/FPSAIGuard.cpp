@@ -4,6 +4,7 @@
 #include "FPSAIGuard.h"
 
 #include "Perception/PawnSensingComponent.h"
+#include "DrawDebugHelpers.h"
 
 // Sets default values
 AFPSAIGuard::AFPSAIGuard()
@@ -13,6 +14,9 @@ AFPSAIGuard::AFPSAIGuard()
 
 	SenseComponent = CreateDefaultSubobject<UPawnSensingComponent>(TEXT("Pawn Sensing Component"));
 
+	// Bind to OnSeePawn Event.
+	SenseComponent->OnSeePawn.AddDynamic(this, &AFPSAIGuard::ReactToSeeingPawn);
+
 }
 
 // Called when the game starts or when spawned
@@ -20,6 +24,16 @@ void AFPSAIGuard::BeginPlay()
 {
 	Super::BeginPlay();
 	
+}
+
+void AFPSAIGuard::ReactToSeeingPawn(APawn * SeenPawn)
+{
+	if (SeenPawn == nullptr)
+	{
+		return;
+	}
+
+	DrawDebugSphere(GetWorld(), SeenPawn->GetActorLocation(), 32.f, 12, FColor::Yellow, false, 10.f);
 }
 
 // Called every frame

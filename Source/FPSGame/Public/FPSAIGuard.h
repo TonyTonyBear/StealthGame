@@ -24,6 +24,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = "Components")
 	UPawnSensingComponent* SenseComponent;
 
+	UFUNCTION()
+	void ReactToSeeingPawn(APawn* SeenPawn);
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
