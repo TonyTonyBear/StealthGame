@@ -18,7 +18,7 @@ AFPSGameMode::AFPSGameMode()
 	HUDClass = AFPSHUD::StaticClass();
 }
 
-void AFPSGameMode::CompleteMission(APawn* InstigatorPawn)	
+void AFPSGameMode::CompleteMission(APawn* InstigatorPawn, bool bMissionSuccessful)	
 {
 	// Disable all input to pawns.
 	// Give points to instigator of this event.
@@ -44,5 +44,5 @@ void AFPSGameMode::CompleteMission(APawn* InstigatorPawn)
 		}
 	}
 
-	OnMissionCompleted(InstigatorPawn);
+	OnMissionCompleted(InstigatorPawn, bMissionSuccessful);
 }
